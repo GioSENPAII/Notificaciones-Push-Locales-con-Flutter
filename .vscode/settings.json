@@ -1,0 +1,6 @@
+{
+    "idf.pythonInstallPath": "/opt/miniconda3/bin/python",
+    "cmake.sourceDirectory": "/Users/gio/Downloads/tarea7_flutterLocalNotifications-main/localnotifications/windows/flutter",
+    "dart.sdkPath": "/opt/homebrew/bin/dart",
+    "dart.flutterSdkPath": "/opt/homebrew/bin/flutter"
+}
