@@ -54,8 +54,9 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  // Controlador para el campo de texto del título.
+  // Controladores para los campos de texto.
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
 
   @override
   void initState() {
@@ -73,8 +74,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  // Muestra la notificación con título personalizado.
-  Future<void> _showNotification(String customTitle) async {
+  // Muestra la notificación con título y mensaje personalizados.
+  Future<void> _showNotification(String customTitle, String customMessage) async {
     // Configuración de detalles de la notificación para Android.
     const AndroidNotificationDetails androidNotificationDetails =
     AndroidNotificationDetails(
@@ -93,11 +94,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     const NotificationDetails notificationDetails =
     NotificationDetails(android: androidNotificationDetails);
 
-    // Muestra la notificación con el título personalizado.
+    // Muestra la notificación con título y mensaje personalizados.
     await flutterLocalNotificationsPlugin.show(
       0, // ID de la notificación.
       customTitle.isEmpty ? 'Título por defecto' : customTitle, // Título personalizado.
-      '¡Tu notificación ha sido enviada exitosamente! 🎉', // Mensaje fijo.
+      customMessage.isEmpty ? '¡Tu notificación ha sido enviada!' : customMessage, // Mensaje personalizado.
       notificationDetails,
       payload: 'custom_notification', // Datos adicionales opcionales.
     );
@@ -170,7 +171,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
               // Título principal
               const Text(
-                '✨ Crea tu notificación ✨',
+                '✨ Crea tu notificación personalizada ✨',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -182,7 +183,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
               // Subtítulo
               Text(
-                'Escribe un título personalizado para tu notificación',
+                'Escribe un título y mensaje personalizados',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -191,7 +192,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Campo de texto con diseño colorido
+              // Campo de texto para el título
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
@@ -211,6 +212,55 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     hintText: 'Ej: ¡Hola mundo!',
                     prefixIcon: const Icon(
                       Icons.title,
+                      color: Colors.deepPurple,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelStyle: const TextStyle(
+                      color: Colors.deepPurple,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(
+                        color: Colors.deepPurple,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Campo de texto para el mensaje
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: '💬 Mensaje de la notificación',
+                    hintText: 'Ej: Este es tu mensaje personalizado...',
+                    prefixIcon: const Icon(
+                      Icons.message,
                       color: Colors.deepPurple,
                     ),
                     border: OutlineInputBorder(
@@ -261,10 +311,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_titleController.text.isNotEmpty) {
-                      _showNotification(_titleController.text);
-                      // Limpiar el campo después de enviar
+                    if (_titleController.text.isNotEmpty && _messageController.text.isNotEmpty) {
+                      _showNotification(_titleController.text, _messageController.text);
+                      // Limpiar los campos después de enviar
                       _titleController.clear();
+                      _messageController.clear();
                       // Mostrar confirmación
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -280,7 +331,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       // Mostrar mensaje de error
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('⚠️ Por favor escribe un título'),
+                          content: const Text('⚠️ Por favor completa título y mensaje'),
                           backgroundColor: Colors.orange,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
@@ -328,7 +379,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'El mensaje de la notificación será fijo. Solo puedes personalizar el título.',
+                        'Ahora puedes personalizar tanto el título como el mensaje de tus notificaciones.',
                         style: TextStyle(
                           color: Colors.blue[700],
                           fontSize: 14,
@@ -348,6 +399,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 }
